@@ -20,7 +20,8 @@
   },
   "homepage": "https://github.com/sx-1/alexa-remote-http#readme",
   "dependencies": {
-    "alexa-remote2": "^2.2.0",
-    "express": "^4.16.4"
+    "alexa-cookie2": "^2.0.1",
+    "express": "^4.16.4",
+    "extend": "^3.0.2"
   }
 }

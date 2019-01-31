@@ -28,7 +28,9 @@ app.get('/speak', (req, res) =>
   if ('text' in req.query === false)
     return res.status(500).json(error(500, req.route, 'Alexa.Speak', 'Missing parameter "text"'));
 
-  alexa.sendSequenceCommand('speak', req.query.device, req.query.text, function(err)
+  config.logger && config.logger('Alexa-API: device: ' + req.query.device);
+  config.logger && config.logger('Alexa-API: text: ' + req.query.text);
+  alexa.sendSequenceCommand(req.query.device, 'speak', req.query.text, function(err)
   {
     if (err)
       return res.status(500).json(error(500, req.route, 'Alexa.Speak', err));
@@ -47,7 +49,7 @@ app.get('/volume', (req, res) =>
   if ('value' in req.query === false)
     return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', 'Missing parameter "value"'));
 
-  alexa.sendSequenceCommand('volume', req.query.device, req.query.value, function(err)
+  alexa.sendSequenceCommand(req.query.device, 'volume', req.query.value, function(err)
   {
     if (err)
       return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err));
@@ -66,7 +68,7 @@ app.get('/push', (req, res) =>
   if ('text' in req.query === false)
     return res.status(500).json(error(500, req.route, 'Alexa.Notifications.SendMobilePush', 'Missing parameter "text"'));
 
-  alexa.sendSequenceCommand('volume', req.query.device, req.query.text, function(err)
+  alexa.sendSequenceCommand(req.query.device, 'notification', req.query.text, function(err)
   {
     if (err)
       return res.status(500).json(error(500, req.route, 'Alexa.Notifications.SendMobilePush', err));
@@ -128,7 +130,8 @@ fs.readFile(config.cookieLocation, 'utf8', (err, data) =>
 
 function startServer()
 {
-  alexa.init({
+  alexa.init(
+  {
     cookie: config.cookie,
     logger: config.logger,
     alexaServiceHost: config.alexaServiceHost,
@@ -154,10 +157,10 @@ function error(status, source, title, detail)
 {
   let error =
   {
-    status: status,
-    source: {pointer: source},
-    title: title,
-    detail: detail
+    'status': status,
+    'source': {pointer: source},
+    'title': title,
+    'detail': detail
   };
 
   config.logger && config.logger('Alexa-API: ' + title + ': ' + detail);
