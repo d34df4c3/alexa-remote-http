@@ -24,16 +24,17 @@ app.get('/speak', (req, res) =>
   res.type('json');
 
   if ('device' in req.query === false)
-    return res.status(500).json(error(500, req.route, 'Alexa.Speak', 'Missing parameter "device"'));
-  if ('text' in req.query === false)
-    return res.status(500).json(error(500, req.route, 'Alexa.Speak', 'Missing parameter "text"'));
-
+    return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "device"'));
   config.logger && config.logger('Alexa-API: device: ' + req.query.device);
+
+  if ('text' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "text"'));
   config.logger && config.logger('Alexa-API: text: ' + req.query.text);
+
   alexa.sendSequenceCommand(req.query.device, 'speak', req.query.text, function(err)
   {
     if (err)
-      return res.status(500).json(error(500, req.route, 'Alexa.Speak', err));
+      return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', err));
     res.status(200).json({});
   });
 });
@@ -45,9 +46,12 @@ app.get('/volume', (req, res) =>
   res.type('json');
 
   if ('device' in req.query === false)
-    return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', 'Missing parameter "device"'));
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "device"'));
+  config.logger && config.logger('Alexa-API: device: ' + req.query.device);
+
   if ('value' in req.query === false)
-    return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', 'Missing parameter "value"'));
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "value"'));
+  config.logger && config.logger('Alexa-API: value: ' + req.query.value);
 
   alexa.sendSequenceCommand(req.query.device, 'volume', req.query.value, function(err)
   {
@@ -64,14 +68,17 @@ app.get('/push', (req, res) =>
   res.type('json');
 
   if ('device' in req.query === false)
-    return res.status(500).json(error(500, req.route, 'Alexa.Notifications.SendMobilePush', 'Missing parameter "device"'));
+    return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.SendMobilePush', 'Missing parameter "device"'));
+  config.logger && config.logger('Alexa-API: device: ' + req.query.device);
+
   if ('text' in req.query === false)
-    return res.status(500).json(error(500, req.route, 'Alexa.Notifications.SendMobilePush', 'Missing parameter "text"'));
+    return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.SendMobilePush', 'Missing parameter "text"'));
+  config.logger && config.logger('Alexa-API: text: ' + req.query.text);
 
   alexa.sendSequenceCommand(req.query.device, 'notification', req.query.text, function(err)
   {
     if (err)
-      return res.status(500).json(error(500, req.route, 'Alexa.Notifications.SendMobilePush', err));
+      return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.SendMobilePush', err));
     res.status(200).json({});
   });
 });
@@ -83,23 +90,27 @@ app.get('/reminder', (req, res) =>
   res.type('json');
 
   if ('device' in req.query === false)
-    return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', 'Missing parameter "device"'));
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "device"'));
+  config.logger && config.logger('Alexa-API: device: ' + req.query.device);
+
   if ('text' in req.query === false)
-    return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', 'Missing parameter "text"'));
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "text"'));
+  config.logger && config.logger('Alexa-API: text: ' + req.query.text);
+
   if ('when' in req.query === false)
-    return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', 'Missing parameter "when"'));
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "when"'));
+  config.logger && config.logger('Alexa-API: when: ' + req.query.when);
 
   // when: YYYY-MM-DD HH:MI:SS
-  let dateFormat = new RegExp('^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$');
-  let dateValues = dateFormat.exec(req.query.when);
+  let dateValues = req.query.when.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
   if (dateValues === null)
-    return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', 'Invalid "when" format. Expected: YYYY-MM-DD HH:MI:SS'));
-  let when = new Date(dateValues[0], dateValues[1], dateValues[2], dateValues[3], dateValues[4], dateValues[5])
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Invalid "when" format. Expected: YYYY-MM-DD HH:MI:SS'));
+  let when = new Date(dateValues[1], dateValues[2], dateValues[3], dateValues[4], dateValues[5], dateValues[6])
 
   alexa.setReminder(req.query.device, when.getTime(), req.query.text, function(err)
   {
     if (err)
-      return res.status(500).json(error(500, req.route, 'createReminder', err));
+      return res.status(500).json(error(500, req.route.path, 'createReminder', err));
     res.status(200).json({});
   });
 });
@@ -108,9 +119,10 @@ app.get('/reminder', (req, res) =>
 app.get('/stop', (req, res) =>
 {
   config.logger && config.logger('Alexa-API: Shuting down');
-  server.stop(() =>
+  res.status(200).json({});
+  server.close(() =>
   {
-    res.status(200).json({});
+    process.exit(0);
   });
 });
 
