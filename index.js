@@ -86,7 +86,7 @@ app.get('/push', (req, res) =>
 /***** create a reminder *****/
 app.get('/reminder', (req, res) =>
 {
-  config.logger && config.logger('Alexa-API: Alexa.DeviceControls.Volume');
+  config.logger && config.logger('Alexa-API: Alexa.Reminder');
   res.type('json');
 
   if ('device' in req.query === false)
@@ -106,6 +106,7 @@ app.get('/reminder', (req, res) =>
   if (dateValues === null)
     return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Invalid "when" format. Expected: YYYY-MM-DD HH:MI:SS'));
   let when = new Date(dateValues[1], dateValues[2], dateValues[3], dateValues[4], dateValues[5], dateValues[6])
+  config.logger && config.logger('Alexa-API: when: ' + when);
 
   alexa.setReminder(req.query.device, when.getTime(), req.query.text, function(err)
   {

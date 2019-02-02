@@ -591,42 +591,20 @@ class AlexaRemote extends EventEmitter {
     }
 
     parseValue4Notification(notification, value) {
+      
+                console.log('--------Typeof: ' + (typeof value) + 'Value: ' + value + '-----------------');
         switch (typeof value) {
             case 'object':
-                notification = extend(notification, value); // we combine the objects
-                /*
+                if (value instanceof Date)
                 {
-                    'alarmTime': 0,
-                    'createdDate': 1522585752734,
-                    'deferredAtTime': null,
-                    'deviceSerialNumber': 'G090LF09643202VS',
-                    'deviceType': 'A3S5BH2HU6VAYF',
-                    'geoLocationTriggerData': null,
-                    'id': 'A3S5BH2HU6VAYF-G090LF09643202VS-17ef9b04-cb1d-31ed-ab2c-245705d904be',
-                    'musicAlarmId': null,
-                    'musicEntity': null,
-                    'notificationIndex': '17ef9b04-cb1d-31ed-ab2c-245705d904be',
-                    'originalDate': '2018-04-01',
-                    'originalTime': '20:00:00.000',
-                    'provider': null,
-                    'recurringPattern': null,
-                    'remainingTime': 0,
-                    'reminderLabel': null,
-                    'sound': {
-                        'displayName': 'Countertop',
-                        'folder': null,
-                        'id': 'system_alerts_repetitive_04',
-                        'providerId': 'ECHO',
-                        'sampleUrl': 'https://s3.amazonaws.com/deeappservice.prod.notificationtones/system_alerts_repetitive_04.mp3'
-                    },
-                    'status': 'OFF',
-                    'timeZoneId': null,
-                    'timerLabel': null,
-                    'triggerTime': 0,
-                    'type': 'Alarm',
-                    'version': '4'
+                  if (notification.type !== 'Timer')
+                  {
+                    notification.alarmTime = value.getTime();
+                    notification.originalTime = `${_00 (value.getHours ())}:${_00 (value.getMinutes ())}:${_00 (value.getSeconds ())}.000`;
+                  }
                 }
-                */
+                notification = extend(notification, value); // we combine the objects
+                
                 break;
             case 'number':
                 if (notification.type !== 'Timer') {
@@ -636,17 +614,6 @@ class AlexaRemote extends EventEmitter {
                 }
                 /*else {
                     //notification.remainingTime = value;
-                }*/
-                break;
-            case 'date':
-                if (notification.type !== 'Timer') {
-                    notification.alarmTime = value.getTime();
-                    notification.originalTime = `${_00 (value.getHours ())}:${_00 (value.getMinutes ())}:${_00 (value.getSeconds ())}.000`;
-                }
-                /*else {
-                    let duration = value.getTime() - Date.now();
-                    if (duration < 0) duration = value.getTime();
-                    notification.remainingTime = duration;
                 }*/
                 break;
             case 'boolean':
